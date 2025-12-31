@@ -1,0 +1,17 @@
+{
+  "name": "ts-server",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@google/gemini-cli": "^0.24.0-nightly.20251227.37be16243",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "trustedDependencies": [
+    "protobufjs",
+    "tree-sitter-bash"
+  ]
+}
