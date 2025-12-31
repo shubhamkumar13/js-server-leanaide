@@ -1,14 +1,37 @@
 {
   "name": "ts-server",
-  "module": "index.ts",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "init": "mise exec bun -- bun i",
+    "run-client-server": "mise exec bun -- bun run ./src/producer_server.ts",
+    "run-leanaide-server": "mise exec bun -- bun run ./src/leanaide_server.ts",
+    "run-dummy-client": "mise exec bun -- bun run ./tests/producer_client.ts",
+    "format": "mise exec bun -- bunx oxfmt",
+    "lint": "mise exec bun -- bunx oxlint"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.9",
+    "chalk": "^5.6.2",
+    "execa": "^9.6.1",
+    "express": "^5.2.1",
+    "iter-tools": "^7.5.4",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "jest": "^30.2.0"
+  },
   "devDependencies": {
-    "@google/gemini-cli": "^0.24.0-nightly.20251227.37be16243",
-    "@types/bun": "latest"
+    "@socket.io/bun-engine": "^0.1.0",
+    "@types/amqplib": "^0.10.8",
+    "@types/bun": "latest",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "oxfmt": "^0.21.0",
+    "oxlint": "^1.51.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "trustedDependencies": [
     "protobufjs",
