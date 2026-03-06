@@ -1,16 +1,18 @@
 import { console } from "node:inspector";
-import { startLeanaideServer } from "./src/leanaide_server";
-import { startProducerServer } from "./src/producer_server";
+import { start } from "./src/leanaide";
+import { run } from "./src/handler";
 
-const main = async function () {
-  const [leanaide, producer] = await Promise.all([startLeanaideServer(), startProducerServer()]);
+const main = async () => {
+  const [leanaide, handler] = await Promise.all([start(), run()]);
 
+  // start the leanaide process spawn
+  await start();
   console.log(`All servers started`);
 
   const shutdown = async function () {
     console.log("Shutting down");
     await leanaide.stop();
-    await producer.stop();
+    await handler.stop();
     process.exit(0);
   };
 

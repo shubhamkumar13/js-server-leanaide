@@ -1,0 +1,40 @@
+       [ HTTP CLIENT ]
+              |
+      POST /  | (JSON body)
+              v
+    +-------------------+          [ QUEUES.TS ]
+    |  HANDLER.TS       |      +---------------------+
+    | (Express Server)  |----->|      inputQ         |
+    +---------^---------+      | (Buffer requests)   |
+              |                +----------+----------+
+      (HTTP   |                           | (if state == 'ready')
+      Response)                           v
+              |                +---------------------+
+    +---------+---------+      |      processQ       |
+    |  psReader 'result'|      | (Writes to stdin)   |
+    +---------^---------+      +----------+----------+
+              |                           |
+              | (JSON Result)             | (stdin: "data\r\n")
+              |                           v
+    +---------+---------+      +---------------------+
+    |    resultQ        |      |  LEANAIDE.TS        |
+    | (Collects output) |<-----+ (Execa Child Proc)  |
+    +---------^---------+      +----------+----------+
+              |                           |
+              | (stdout lines)            | (stdout stream)
+              |                           v
+    +---------+---------------------------+----------+
+    |                  displayQ                     |
+    | (Analyzes process output and manages state)   |
+    +-----------------------+-----------------------+
+                            |
+           +----------------+----------------+
+           |                |                |
+    [ IF "Server ready" ]   |      [ IF "Output sent" ]
+           |         [ IF state == 'waitOutput' ]    |
+           v                |                v
+    +--------------+        v        +---------------+
+    | State: READY |  +-----------+  | State: RESET  |
+    | Start inputQ |  | Add to    |  | Flush resultQ |
+    +--------------+  | resultQ   |  +---------------+
+                      +-----------+

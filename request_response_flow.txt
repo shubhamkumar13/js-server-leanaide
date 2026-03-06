@@ -1,0 +1,37 @@
+CLIENT       [ handler.ts ]          [ queues.ts ]          [ leanaide.ts ]      [ CHILD PROC ]
+  |                |                      |                      |                      |
+  |--- POST / ---->|                      |                      |                      |
+  | (JSON body)    |-- inputQ.addItem() ->|                      |                      |
+  |                |                      |                      |                      |
+  |                |   [ STATE: READY ]   |                      |                      |
+  |                |          |           |                      |                      |
+  |                |<-- resultQ.start()   |                      |                      |
+  |                |                      |                      |                      |
+  | [ AWAIT LOOP ] |                      |--- processQ.addItem()|                      |
+  | (Waiting for   |                      |          |           |                      |
+  | 'result' event)|                      |          v           |                      |
+  |       |        |                      | psWriter.emit('write')                      |
+  |       |        |                      |          |           |                      |
+  |       |        |                      |          +---------->|-- (stdin: "data\n") >|
+  |       |        |                      |                      |                      |
+  |       |        |                      |                      |    [ PROCESSING ]    |
+  |       |        |                      |                      |          |           |
+  |       |        |                      |<-- displayQ.addItem()|<-- (stdout: lines) --|
+  |       |        |                      |          |           |                      |
+  |       |        |                      |   [ STATE: WAIT ]    |                      |
+  |       |        |                      |          |           |                      |
+  |       |        |                      |--- resultQ.addItem() |                      |
+  |       |        |                      |          |           |                      |
+  |       |        |                      |    (Collect lines)   |                      |
+  |       |        |                      |          |           |                      |
+  |       |        |                      |   [ "Output sent" ]  |                      |
+  |       |        |                      |          |           |                      |
+  |       |        |                      |--- resultQ.flush() ->|                      |
+  |       |        |                      |                      |                      |
+  |       |        |                      |          +-----------|-- psReader.emit      |
+  |       |        |                      |          |           |      ('result')      |
+  |       v        |                      |          v           |                      |
+  | [ LOOP RESUMES ]<--------------------------------+           |                      |
+  |       |        |                      |                      |                      |
+  |<-- res.send() -|                      |                      |                      |
+  | (HTTP 200)     |                      |                      |                      |
