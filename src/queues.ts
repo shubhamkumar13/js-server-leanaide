@@ -1,4 +1,4 @@
-import { LiteQueuer as Queuer } from "@tanstack/pacer-lite";
+import { Queuer } from "@tanstack/pacer";
 import { psReader, psWriter } from "./leanaide";
 import { isOutputSent, isServerReady } from "./constants";
 import { Array } from "effect";
@@ -48,16 +48,16 @@ export const resultQ = new Queuer<string>((_) => _, {
   },
 });
 
-export const outputQ = new Queuer<string>(_ => _, {
+export const outputQ = new Queuer<string>((_) => _, {
   started: true,
   wait: 1000,
-})
+});
 
 export const displayQ = new Queuer<string>(
   // get the value from display queue
   (item) => {
     // first log to stdout
-    psReader.emit('console', item)
+    psReader.emit("console", item);
     // if the line from leanaide contains
     // line "Server ready"
     if (isServerReady(item)) {

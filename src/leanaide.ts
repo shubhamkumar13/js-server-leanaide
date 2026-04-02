@@ -21,6 +21,7 @@ const $ps = createStore(() =>
     all: true,
     gracefulCancel: true,
     cancelSignal: controller.signal,
+    env: {OPENAI_API_KEY : import.meta.env.OPENAI_API_KEY}
   }),
 );
 
